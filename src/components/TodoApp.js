@@ -47,7 +47,7 @@ const TodoApp = () => {
 
       <div className="tasks_section">
         {tasks.map((task) => (
-          <div key={task.id} className={`task ${editingTaskId === task.id ? 'editing-task' : ''}`}>
+          <div key={task.id} className={`task ${editingTaskId === task.id }`}>
             {editingTaskId === task.id ? (
               <>
                 <textarea
