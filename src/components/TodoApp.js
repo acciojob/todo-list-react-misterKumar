@@ -35,25 +35,25 @@ const TodoApp = () => {
   return (
     <div className="todo-app">
       <div className="add_tasks_section">
-        <input
-          type="text"
+        <textarea
+          rows="3"
           placeholder="Add a new task"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
-        />
+        ></textarea>
         <button onClick={addTask}>Add</button>
       </div>
 
       <div className="tasks_section">
         {tasks.map((task) => (
-          <div key={task.id} className="task">
+          <div key={task.id} className={`task ${editingTaskId === task.id ? 'editing-task' : ''}`}>
             {editingTaskId === task.id ? (
               <>
-                <input
-                  type="text"
+                <textarea
+                  rows="3"
                   value={editedTask}
                   onChange={(e) => setEditedTask(e.target.value)}
-                />
+                ></textarea>
                 <button className="save" onClick={saveTask}>
                   Save
                 </button>
