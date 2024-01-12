@@ -35,6 +35,7 @@ const TodoApp = () => {
   return (
     <div className="todo-app">
       <div className="add_tasks_section">
+      <h3>To Do List</h3>
         <textarea
           rows="3"
           placeholder="Add a new task"
