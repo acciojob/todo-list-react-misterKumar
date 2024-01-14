@@ -1,86 +1,85 @@
+import '../styles/App.css';
+import React, { useState } from 'react';
 
-import React,{useState} from "react";
-import './../styles/App.css';
-
-const App = () => {
+function App() {
+  const [taskInput, setTaskInput] = useState('');
   const [tasks, setTasks] = useState([]);
-  const [taskInput, setTaskInput] = useState("");
   const [editIndex, setEditIndex] = useState(-1);
 
-  const handleAdd = () => {
-    if (taskInput.trim() !== "") {
-      const updatedTasks = [...tasks];
-      if (editIndex !== -1) {
-        updatedTasks[editIndex] = taskInput;
-      } else {
-        updatedTasks.push(taskInput);
-      }
+  const handleTaskInputChange = (event) => {
+    setTaskInput(event.target.value);
+  };
 
-      setTasks(updatedTasks);
-      setTaskInput("");
-      setEditIndex(-1);
+  const addTask = () => {
+    if (taskInput !== '') {
+      setTasks([...tasks, taskInput]);
+      setTaskInput('');
     }
   };
 
-  const handleDelete = (index) => {
+  const deleteTask = (index) => {
     const updatedTasks = [...tasks];
     updatedTasks.splice(index, 1);
     setTasks(updatedTasks);
-    setEditIndex(-1);
   };
 
-  const handleEdit = (index) => {
-    setTaskInput(tasks[index]);
+  const editTask = (index) => {
     setEditIndex(index);
+    setTaskInput(tasks[index]);
   };
 
-  const handleUpdate = () => {
-    handleAdd();
+  const saveTask = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks[index] = taskInput;
+    setTasks(updatedTasks);
+    setEditIndex(-1);
+    setTaskInput('');
   };
 
   return (
-    <div className="add_tasks_section">
-      <h1>To Do App</h1>
-      <input
-        type="text"
-        name="task"
-        value={taskInput}
-        onChange={(e) => setTaskInput(e.target.value)}
-      />
-      <button onClick={handleAdd}>
-        {editIndex !== -1 ? "Save" : "Add Task"}
-      </button>
+    <div className="App">
+      
+      <div className="add_tasks_section">
+        <h3>To Do List</h3>
+        <textarea
+          value={taskInput}
+          onChange={handleTaskInputChange}
+          placeholder="Add a new task"
+        />
+        <button onClick={addTask}>Add Task</button>
+      </div>
 
-      <ul className="tasks_section">
-        {tasks.map((task, index) => (
-          <li className="task" key={index}>
-            {editIndex === index ? (
-              <>
-                <input
-                  type="text"
-                  value={taskInput}
-                  onChange={(e) => setTaskInput(e.target.value)}
-                />
-                <button className="save" onClick={handleUpdate}>
-                  Save
-                </button>
-              </>
-            ) : (
-              <>
-                {task}
-                <button className=".edit" onClick={() => handleEdit(index)}>
-                  Edit
-                </button>
-                <button className=".delete" onClick={() => handleDelete(index)}>
-                  Delete
-                </button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+      <div className="tasks_section">
+        <ul id="taskList">
+          {tasks.map((task, index) => (
+            <li key={index} className="task">
+              {editIndex === index ? (
+                <div>
+                  <textarea
+                    value={taskInput}
+                    onChange={handleTaskInputChange}
+                  ></textarea>
+                  <button className="save" onClick={() => saveTask(index)}>
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <span>{task}</span>
+                  <button className="edit" onClick={() => editTask(index)}>
+                    Edit
+                  </button>
+                  <button className="delete" onClick={() => deleteTask(index)}>
+                    Delete
+                  </button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
 
-export default App
+export default App;
