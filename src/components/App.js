@@ -1,82 +1,143 @@
-import '../styles/App.css';
-import React, { useState } from 'react';
+import React, { useState, useReducer, useRef } from "react";
+import "./../styles/App.css";
 
-function App() {
-  const [taskInput, setTaskInput] = useState('');
-  const [tasks, setTasks] = useState([]);
-  const [editIndex, setEditIndex] = useState(-1);
+function Lister(props) {
+  return (
+    <>
+      <div className="task list col-6 bg-light p-3 mt-3 justify-content-center align-self-center">
+        {props.item.name}
+      </div>
+      <div className="col-3 bg-light p-3 mt-3">
+        <button
+          className="edit btn btn-success w-100"
+          onClick={() => props.edit(props.index)}
+        >
+          Edit
+        </button>
+      </div>
+      <div className="col-3 bg-light p-3 mt-3">
+        <button
+          className="delete btn btn-danger w-100"
+          onClick={() => props.dlt(props.index)}
+        >
+          Delete
+        </button>
+      </div>
+    </>
+  );
+}
 
-  const handleTaskInputChange = (event) => {
-    setTaskInput(event.target.value);
-  };
-
-  const addTask = () => {
-    if (taskInput !== '') {
-      setTasks([...tasks, taskInput]);
-      setTaskInput('');
-    }
-  };
-
-  const deleteTask = (index) => {
-    const updatedTasks = [...tasks];
-    updatedTasks.splice(index, 1);
-    setTasks(updatedTasks);
-  };
-
-  const editTask = (index) => {
-    setEditIndex(index);
-    setTaskInput(tasks[index]);
-  };
-
-  const saveTask = (index) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index] = taskInput;
-    setTasks(updatedTasks);
-    setEditIndex(-1);
-    setTaskInput('');
-  };
+function Editor(props) {
+  const [val, setVal] = useState(props.item.name);
 
   return (
-    <div className="App">
-      
-      <div className="add_tasks_section">
-        <h3>To Do List</h3>
+    <>
+      <div className="col-9 bg-light p-3 mt-3 justify-content-center align-self-center">
         <textarea
-          value={taskInput}
-          onChange={handleTaskInputChange}
-          placeholder="Add a new task"
+          rows="1"
+          className="editTask w-100"
+          onChange={(e) => {
+            setVal(e.target.value);
+          }}
+          value={val}
         />
-        <button onClick={addTask}>Add Task</button>
       </div>
+      <div className="col-3 bg-light p-3 mt-3">
+        <button
+          className="save saveTask btn btn-success w-100"
+          onClick={() => props.edit({ index: props.index, val })}
+        >
+          Save
+        </button>
+      </div>
+    </>
+  );
+}
 
-      <div className="tasks_section">
-        <ul id="taskList">
-          {tasks.map((task, index) => (
-            <li key={index} className="task">
-              {editIndex === index ? (
-                <div>
-                  <textarea
-                    value={taskInput}
-                    onChange={handleTaskInputChange}
-                  ></textarea>
-                  <button className="save" onClick={() => saveTask(index)}>
-                    Save
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <span>{task}</span>
-                  <button className="edit" onClick={() => editTask(index)}>
-                    Edit
-                  </button>
-                  <button className="delete" onClick={() => deleteTask(index)}>
-                    Delete
-                  </button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+function App() {
+  let mainInput = useRef(null);
+
+  const [input, controlInput] = useState("");
+
+  const [tasks, addTask] = useReducer((tasks, task) => {
+    let temp = [...tasks];
+    let tt = {
+      name: task,
+      edit: false,
+    };
+    if (task !== "") {
+      mainInput.current.value = "";
+      temp.push(tt);
+    }
+    return temp;
+  }, []);
+
+  const [edit1, editTaskState] = useReducer((edit1, index) => {
+    let temp = [...tasks];
+    temp[index].edit = true;
+    return temp;
+  }, "");
+
+  const [edit2, editTaskInfo] = useReducer((edit2, { index, val }) => {
+    let temp = [...tasks];
+    if (val !== "") {
+      temp[index].name = val;
+      temp[index].edit = false;
+    }
+    return temp;
+  }, "");
+
+  const [edit3, deleteTaskInfo] = useReducer((edit3, index) => {
+    let temp = [...tasks];
+    tasks.splice(index, 1);
+    return temp;
+  }, "");
+
+  return (
+    <div id="main" className="container">
+      <div className="add_tasks_section jumbotron row mb-0">
+        <div className="col-12 mb-3 p-2 text-center">
+          <h3>To Do List</h3>
+        </div>
+        <div className="offset-1 col-8">
+          <textarea
+            ref={mainInput}
+            rows="1"
+            className="w-100 h-100"
+            name="task"
+            id="task"
+            onChange={(e) => {
+              e.preventDefault();
+              controlInput(e.target.value);
+            }}
+          />
+        </div>
+        <div className="col-2">
+          <button
+            className="w-100 btn btn-primary"
+            id="btn"
+            onClick={() => {
+              addTask(input);
+            }}
+          >
+            Add
+          </button>
+        </div>
+      </div>
+      <div className="tasks_section row p-2">
+        {tasks.map((item, index) =>
+          item.edit ? (
+            <Editor key={index} item={item} index={index} edit={editTaskInfo} />
+          ) : (
+            <Lister
+              key={index}
+              item={item}
+              index={index}
+              edit={editTaskState}
+              dlt={deleteTaskInfo}
+            />
+          )
+        )}
       </div>
     </div>
   );
